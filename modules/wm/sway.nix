@@ -38,6 +38,7 @@ in {
       ordenada.globals.wm = "${cfg.package}/bin/sway";
       ordenada.globals.wayland = true;
 
+      hardware.graphics.enable = true;
       security.polkit.enable = true;
       environment.sessionVariables.NIXOS_OZONE_WL = "1";
     }
