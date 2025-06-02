@@ -130,18 +130,6 @@ in {
             "element-text" = { text-color = mkLiteral "inherit"; };
           };
         };
-        # services.gpg-agent.pinentryPackage = lib.mkForce
-        #   (pkgs.writeShellScriptBin "pinentry-bemenu" ''
-        #     PATH="$PATH:${pkgs.coreutils}/bin:${package}/bin"
-        #     unset BEMENU_OPTS
-        #     "${pkgs.pinentry-bemenu}/bin/pinentry-bemenu" ${
-        #       mkBemenuOpts (removeAttrs settings [ "cw" "hp" "ch" ])
-        #     }
-        #   '');
-        # wayland.windowManager.sway.config.menu = ''
-        #   ${pkgs.j4-dmenu-desktop}/bin/j4-dmenu-desktop \
-        #    --dmenu="${package}/bin/bemenu ${mkOpts settings}"
-        # '';
       });
   };
 }
