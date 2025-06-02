@@ -7,6 +7,7 @@ in
   imports = [
     ./bar/waybar.nix
     ./launcher/bemenu.nix
+    ./launcher/rofi.nix
     ./kanshi.nix
     ./sway.nix
     ./swaylock.nix
