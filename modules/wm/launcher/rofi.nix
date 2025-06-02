@@ -14,6 +14,7 @@ in {
         default = if config.ordenada.globals.wayland then
           pkgs.rofi-wayland
         else
+          ## TODO: Test under X11
           pkgs.wofi;
         description = "The rofi package to use.";
       };
