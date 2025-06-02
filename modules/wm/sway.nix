@@ -94,6 +94,7 @@ in {
                 titlebar = false;
                 border = 2;
               };
+              menu = config.ordenada.globals.launcher;
               colors = with pkgs.lib.nix-rice.color;
                 let
                   background = base00;
