@@ -14,7 +14,7 @@ in {
         default = if config.ordenada.globals.wayland then
           pkgs.rofi-wayland
         else
-          ## TODO: Test under X11
+        ## TODO: Test under X11
           pkgs.wofi;
         description = "The rofi package to use.";
       };
@@ -28,12 +28,23 @@ in {
         default = true;
         description = "Whether to show icons.";
       };
+      enableLauncher = mkOption {
+        type = types.bool;
+        description = "Whether to enable this feature as the global launcher.";
+        default = true;
+      };
+      enablePinentry = mkOption {
+        type = types.bool;
+        description = "Whether to enable this feature as the global pinentry.";
+        default = true;
+      };
     };
   };
   config = lib.mkIf cfg.enable {
     ## TODO: Use a `setGlobal` function here to check for `ordenada.globals.launcher === null`
     ##       and print a warning if so
-    ordenada.globals.launcher = "${cfg.package}/bin/rofi -show drun";
+    ordenada.globals.launcher =
+      mkIf cfg.enableLauncher "${cfg.package}/bin/rofi -show drun";
 
     home-manager = mkHomeConfig config "rofi" (user:
       with config.home-manager.users.${user.name}.programs.rofi; {
@@ -131,6 +142,10 @@ in {
             "element-text" = { text-color = mkLiteral "inherit"; };
           };
         };
+        
+        ## Setting rofi as pinentry
+        services.gpg-agent.pinentryPackage =
+          lib.mkIf cfg.enablePinentry (lib.mkForce pkgs.pinentry-rofi);
       });
   };
 }
