@@ -144,7 +144,7 @@ in {
         };
         
         ## Setting rofi as pinentry
-        services.gpg-agent.pinentryPackage =
+        services.gpg-agent.pinentry.package =
           lib.mkIf cfg.enablePinentry (lib.mkForce pkgs.pinentry-rofi);
       });
   };
