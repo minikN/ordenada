@@ -15,7 +15,7 @@ in {
           pkgs.rofi-wayland
         else
         ## TODO: Test under X11
-          pkgs.wofi;
+          pkgs.rofi;
         description = "The rofi package to use.";
       };
       showActions = mkOption {
