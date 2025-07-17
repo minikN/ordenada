@@ -1,38 +1,25 @@
 {
   imports = [
-    ./age.nix
-    ./android.nix
+    ./browser
+    ./development
+    ./editor
+    ./messaging
+    ./lang
+    ./shell
+    ./scripts
+    ./security
+    ./system
+    ./virtualization
+    ./wm
+
     ./base.nix
-    ./bash.nix
-    ./bluetooth.nix
-    ./clojure.nix
-    ./compile.nix
-    ./direnv.nix
-    ./docker.nix
-    ./emacs
     ./git.nix
-    ./gnupg.nix
     ./gtk.nix
     ./home.nix
-    ./irc.nix
-    ./keyboard.nix
-    ./firefox.nix
-    ./fontutils.nix
-    ./javascript.nix
     ./mail.nix
-    ./markdown.nix
-    ./networking.nix
-    ./nix.nix
-    ./passage.nix
-    ./password-store.nix
     ./playerctl.nix
-    ./pipewire.nix
-    ./qemu.nix
-    ./ssh.nix
     ./tailscale.nix
     ./theme.nix
-    ./wm
     ./xdg.nix
-    ./yaml.nix
   ];
 }
