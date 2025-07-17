@@ -14,6 +14,7 @@ in
     ./swaync.nix
     ./wlogout.nix
   ];
+
   options = {
     ordenada.globals.wayland = mkOption {
       type = types.nullOr types.bool;
