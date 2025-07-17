@@ -51,12 +51,16 @@ in {
     ordenada.globals.launcher =
       mkIf cfg.enableLauncher "${cfg.package}/bin/rofi -show drun";
 
-    ordenada.globals.passwordManager = mkIf cfg.enablePasswordManager "${
-        if config.ordenada.globals.wayland then
-          pkgs.rofi-pass-wayland
-        else
-          pkgs.rofi-pass
-      }/bin/rofi-pass";
+    ordenada.globals.passwordManager = let
+      rofiPkg = if config.ordenada.globals.wayland then
+        pkgs.rofi-pass-wayland
+      else
+        pkgs.rofi-pass;
+      rofiPassExec = pkgs.writeShellScriptBin "rofi-pass" ''
+        export PASSWORD_STORE_DIR="${features.password-store.storeDir}"
+        exec "${rofiPkg}/bin/rofi-pass" "$@"
+      '';
+    in mkIf cfg.enablePasswordManager "${rofiPassExec}/bin/rofi-pass";
 
     home-manager = mkHomeConfig config "rofi" (user:
       with config.home-manager.users.${user.name}.programs.rofi; {
@@ -162,18 +166,6 @@ in {
         xdg.configFile."rofi-pass/config".text = ''
           _rofi () {
             ${config.ordenada.globals.launcher} -i -no-auto-select "$@"
-          }
-          clibpoard_backend=${
-            if config.ordenada.globals.wayland then
-              "wl-clipboard"
-            else
-              "xclip"
-          }
-          backend=${
-            if config.ordenada.globals.wayland then
-              "wtype"
-            else
-              "xdotool"
           }
 
           copy_pass="Alt+y"
