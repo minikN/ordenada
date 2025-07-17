@@ -38,6 +38,12 @@ in {
         description = "Whether to enable this feature as the global pinentry.";
         default = true;
       };
+      enablePasswordManager = mkOption {
+        type = types.bool;
+        description =
+          "Whether to enable this feature as the global password manager.";
+        default = true;
+      };
     };
   };
   config = lib.mkIf cfg.enable {
@@ -45,6 +51,13 @@ in {
     ##       and print a warning if so
     ordenada.globals.launcher =
       mkIf cfg.enableLauncher "${cfg.package}/bin/rofi -show drun";
+
+    ordenada.globals.passwordManager = mkIf cfg.enablePasswordManager "${
+        if config.ordenada.globals.wayland then
+          pkgs.rofi-pass-wayland
+        else
+          pkgs.rofi-pass
+      }/bin/rofi-pass";
 
     home-manager = mkHomeConfig config "rofi" (user:
       with config.home-manager.users.${user.name}.programs.rofi; {
@@ -142,10 +155,31 @@ in {
             "element-text" = { text-color = mkLiteral "inherit"; };
           };
         };
-        
+
         ## Setting rofi as pinentry
         services.gpg-agent.pinentryPackage =
           lib.mkIf cfg.enablePinentry (lib.mkForce pkgs.pinentry-rofi);
+
+        xdg.configFile."rofi-pass/config".text = ''
+          _rofi () {
+            ${config.ordenada.globals.launcher} -i -no-auto-select "$@"
+          }
+          clibpoard_backend=${
+            if config.ordenada.globals.wayland then
+              "wl-clipboard"
+            else
+              "xclip"
+          }
+          backend=${
+            if config.ordenada.globals.wayland then
+              "wtype"
+            else
+              "xdotool"
+          }
+
+          copy_pass="Alt+y"
+          insert_pass="Alt+Y"
+        '';
       });
   };
 }
