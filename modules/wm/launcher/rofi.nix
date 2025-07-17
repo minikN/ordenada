@@ -4,18 +4,17 @@ with pkgs.lib.ordenada;
 
 let
   inherit (lib) mkEnableOption mkOption types;
-  cfg = config.ordenada.features.rofi;
+  features = config.ordenada.features;
+  cfg = features.rofi;
+  rofiPkg =
+    if config.ordenada.globals.wayland then pkgs.rofi-wayland else pkgs.rofi;
 in {
   options = {
     ordenada.features.rofi = {
       enable = mkEnableOption "the rofi feature";
       package = mkOption {
         type = types.package;
-        default = if config.ordenada.globals.wayland then
-          pkgs.rofi-wayland
-        else
-        ## TODO: Test under X11
-          pkgs.rofi;
+        default = rofiPkg;
         description = "The rofi package to use.";
       };
       showActions = mkOption {
