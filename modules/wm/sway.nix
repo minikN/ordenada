@@ -85,10 +85,6 @@ in {
             export _JAVA_AWT_WM_NONREPARENTING=1
           '';
           extraConfigEarly = ''
-            ${if config.ordenada.globals.passwordManager != null then
-              "set $pass ${config.ordenada.globals.passwordManager}"
-            else
-              ""}
             ${if config.ordenada.globals.launcher != null then
               "set $launcher ${config.ordenada.globals.launcher}"
             else
@@ -183,7 +179,7 @@ in {
                   # "${modifier}+Return" = "exec /bin/foot";
                   "${modifier}+Shift+q" = "kill";
                   "${modifier}+d" = "exec $launcher";
-                  "${modifier}+p" = "exec $pass";
+                  "${modifier}+p" = "exec $passwordManager";
 
                   "${modifier}+${left}" = "focus left";
                   "${modifier}+${down}" = "focus down";
