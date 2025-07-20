@@ -84,6 +84,25 @@ let
         on-click = "swaymsg input type:keyboard xkb_switch_layout next";
       };
     };
+    tray = {
+      name = "tray";
+      config = {
+        icon-size = 20;
+        show-passive-items = true;
+        spacing = 10;
+      };
+      style = with config.ordenada.features.theme.scheme.withHashtag; ''
+        #tray {
+          background: ${base02};
+          color: ${base05};
+          font-weight: normal;
+          border: none;
+          border-radius: 0.2em;
+          margin: 0.3em 0.2em;
+          padding: 0.3em 0.4em;
+        }
+      '';
+    };
     clock = {
       name = "clock";
       config = with config.ordenada.features.theme.scheme.withHashtag; {
@@ -195,6 +214,7 @@ let
     battery
     pulseaudio
     swayLanguage
+    tray
     clock
     swaync
   ];
