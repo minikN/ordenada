@@ -5,6 +5,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    darwin.url = "github:lnl7/nix-darwin/master";
+    darwin.inputs.nixpkgs.follows = "nixpkgs";
+
     flake-compat.url = "https://flakehub.com/f/edolstra/flake-compat/1.tar.gz";
     nur.url = "github:nix-community/NUR";
     nix-rice.url = "github:bertof/nix-rice";
@@ -16,34 +20,46 @@
   outputs =
     inputs@{
       nixpkgs,
+      flake-parts,
       nur,
       nix-rice,
       base16,
       home-manager,
-      flake-parts,
       ...
     }:
     let
-      ordenada = nixpkgs.lib.callPackagesWith {
-        inherit (nixpkgs) lib;
-        pkgs = pkgs';
-      } ./lib { };
-      pkgs' = import nixpkgs {
-        system = "x86_64-linux";
-        overlays = [ overlay ];
-      };
-      overlay = _final: prev: {
+      # Move overlay definition here so it's in scope for both flake + perSystem
+      overlay = final: prev: {
         lib = prev.lib // {
-          inherit ordenada;
-          base16 = pkgs'.callPackage base16.lib { };
+          ordenada = nixpkgs.lib.callPackagesWith {
+            inherit (nixpkgs) lib;
+            pkgs = import nixpkgs {
+              inherit (prev) system;
+              overlays = [ ];
+            };
+          } ./lib { };
+
+          base16 = prev.callPackage base16.lib { };
         };
       };
+
+      # Define ordenada for output.lib (doesn't rely on pkgs, just nixpkgs)
+      ordenada = nixpkgs.lib.callPackagesWith {
+        inherit (nixpkgs) lib;
+        pkgs = import nixpkgs {
+          system = "x86_64-linux"; # temporary, overridden in perSystem
+          overlays = [ ];
+        };
+      } ./lib { };
+
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = import inputs.systems;
+
       flake = {
         overlays.default = overlay;
         lib = ordenada;
+
         nixosModules.ordenada =
           { pkgs, ... }:
           {
@@ -60,21 +76,68 @@
               ];
             };
           };
+
+        darwinModules.ordenada =
+          { pkgs, ... }:
+          {
+            imports = [
+              ./modules
+              home-manager.darwinModules.home-manager
+            ];
+            config = {
+              nixpkgs.overlays = [
+                overlay
+                nur.overlays.default
+                nix-rice.overlays.default
+                (final: prev: { inherit inputs; })
+              ];
+            };
+          };
       };
+
       perSystem =
         {
           config,
-          pkgs,
           system,
+          pkgs,
           modulesPath,
           ...
         }:
+        let
+          pkgs' = import nixpkgs {
+            inherit system;
+            overlays = [ overlay ];
+          };
+
+          ordenada' = nixpkgs.lib.callPackagesWith {
+            inherit (nixpkgs) lib;
+            pkgs = pkgs';
+          } ./lib { };
+
+          overlay' = final: prev: {
+            lib = prev.lib // {
+              inherit ordenada';
+              base16 = pkgs'.callPackage base16.lib { };
+            };
+          };
+        in
         {
+          _module.args = {
+            ordenada = ordenada';
+            overlays.default = overlay'; # consumer overlay
+            lib = ordenada'; # consumer lib
+          };
+
           packages = rec {
             docs = pkgs.callPackage ./mkDocs.nix {
               pkgs = pkgs';
             };
             default = docs;
+          };
+
+          apps.darwin-rebuild = {
+            type = "app";
+            program = inputs.darwin.packages.${system}.darwin-rebuild;
           };
         };
     };

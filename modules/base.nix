@@ -38,7 +38,11 @@ let
       homeDirectory = mkOption {
         type = types.str;
         description = "Home directory of primary Ordenada user.";
-        default = "/home/${cfg.userInfo.username}";
+        default =
+          if config.ordenada.globals.isLinux then
+            "/home/${cfg.userInfo.username}"
+          else
+            "/Users/${cfg.userInfo.username}";
       };
       gpgPrimaryKey = mkOption {
         type = types.nullOr types.str;
