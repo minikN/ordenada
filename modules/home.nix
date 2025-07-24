@@ -57,7 +57,7 @@ in
         ## ourselves so other modules work properly
         home.file.".profile".text = mkIf (config.ordenada.globals.shell == null) ''
           . "${config.home-manager.users.${user.name}.home.profileDirectory}/etc/profile.d/hm-session-vars.sh"
-        ''
+        '';
       });
 
       users = mkMerge [
