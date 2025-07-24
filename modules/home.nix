@@ -55,9 +55,9 @@ in
 
         ## If the user isn't using any of the shell modules, add the session-vars to .profile
         ## ourselves so other modules work properly
-        home.file.".profile".text = mkIf (config.ordenada.globals.shell == null) (builtins.trace config.home-manager.users.${user.name}.home.profileDirectory ''
+        home.file.".profile".text = mkIf (config.ordenada.globals.shell == null) ''
           . "${config.home-manager.users.${user.name}.home.profileDirectory}/etc/profile.d/hm-session-vars.sh"
-        '');
+        ''
       });
 
       users = mkMerge [
