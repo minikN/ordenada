@@ -40,6 +40,14 @@ in
         home-manager.useUserPackages = true;
         home-manager.backupFileExtension = "backup";
       }
+      (mkIf (config.ordenada.globals.isDarwin == true && config.ordenada.globals.shell == null) {
+        ## On macOS, .profile isn't sourced by default, so source it if shell isn't
+        ## set so other modules work properly
+        programs.zsh.enable =  true;
+        programs.zsh.loginShellInit = ''
+          [[ -f "$HOME/.profile" ]] && source "$HOME/.profile"
+        '';
+      })
       (mkIf (config.ordenada.globals.isLinux == true) {
         ## Starting the chosen wm on the desired tty if enabled
         environment.loginShellInit = mkIf (cfg.autoStartWmOnTty != null) ''
