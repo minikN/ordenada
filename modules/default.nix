@@ -21,6 +21,9 @@ in
   imports = [
     ./base.nix
     ./home.nix
+    ./xdg.nix
+
+    ./security
     ./shell
   ]
   ++ lib.optionals (isLinux == "1") [
@@ -30,7 +33,6 @@ in
     ./messaging
     ./lang
     ./scripts
-    ./security
     ./system
     ./virtualization
     ./wm
@@ -41,7 +43,6 @@ in
     ./playerctl.nix
     ./tailscale.nix
     ./theme.nix
-    ./xdg.nix
   ]
   ++ lib.optionals (isDarwin == "1") [ ];
 
