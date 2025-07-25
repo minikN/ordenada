@@ -21,6 +21,7 @@ in
   imports = [
     ./base.nix
     ./home.nix
+    ./git.nix
     ./xdg.nix
 
     ./security
@@ -37,7 +38,6 @@ in
     ./virtualization
     ./wm
 
-    ./git.nix
     ./gtk.nix
     ./mail.nix
     ./playerctl.nix
