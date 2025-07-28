@@ -14,8 +14,8 @@ let
   isDarwinPred =
     lib.strings.hasPrefix "x86_64-darwin" system || lib.strings.hasPrefix "aarch64-darwin" system;
 
-    isDarwin = if isDarwinPred == "1" then true else false;
-    isLinux = if isLinuxPred == "1" then true else false;
+  isDarwin = if isDarwinPred == "1" then true else false;
+  isLinux = if isLinuxPred == "1" then true else false;
 in
 {
   imports = [
@@ -29,6 +29,8 @@ in
     
     ./system/fontutils.nix
     ./system/keyboard.nix
+    
+    ./terminal
   ]
   ++ lib.optionals (isLinux == "1") [
     ./browser
