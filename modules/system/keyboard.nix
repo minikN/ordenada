@@ -2,13 +2,21 @@
   config,
   lib,
   pkgs,
+  options,
   ...
 }:
 
 with pkgs.lib.ordenada;
 
 let
-  inherit (lib) types mkOption;
+  inherit (lib)
+    types
+    mkOption
+    mkMerge
+    mkIf
+    ;
+  ifLinux = options: attrs: if !builtins.hasAttr "launchd" options then attrs else { };
+  ifDarwin = options: attrs: if builtins.hasAttr "launchd" options then attrs else { };
 in
 {
   options = {
@@ -42,12 +50,17 @@ in
       };
     };
   };
-  config = {
-    home-manager = mkHomeConfig config "keyboard" (user: {
-      home.keyboard = with user.features.keyboard; {
-        inherit options variant;
-        layout = name;
-      };
-    });
-  };
+  config = mkMerge [
+    (ifLinux options {
+      console.keyMap = config.ordenada.features.keyboard.layout.name;
+    })
+    ({
+      home-manager = mkHomeConfig config "keyboard" (user: {
+        home.keyboard = with user.features.keyboard; {
+          inherit options variant;
+          layout = name;
+        };
+      });
+    })
+  ];
 }
