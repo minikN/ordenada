@@ -9,13 +9,12 @@
 let
   inherit (lib) types mkOption;
 
-  isLinuxPred =
+  isLinux =
     lib.strings.hasPrefix "x86_64-linux" system || lib.strings.hasPrefix "aarch64-linux" system;
   isDarwinPred =
     lib.strings.hasPrefix "x86_64-darwin" system || lib.strings.hasPrefix "aarch64-darwin" system;
 
   isDarwin = if isDarwinPred == "1" then true else false;
-  isLinux = if isLinuxPred == "1" then true else false;
 in
 {
   imports = [
@@ -32,7 +31,7 @@ in
     
     ./terminal
   ]
-  ++ lib.optionals (isLinux == "1") [
+  ++ lib.optionals (isLinux) [
     ./browser
     ./development
     ./editor
