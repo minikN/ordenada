@@ -30,6 +30,11 @@ let
         description = "The size of the font.";
         type = types.int;
       };
+      style = mkOption {
+        description = "The style of the font.";
+        type = types.str;
+        default = "regular";
+      };
     };
   };
   ifDarwin = options: attrs: if builtins.hasAttr "launchd" options then attrs else { };
