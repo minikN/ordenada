@@ -26,6 +26,7 @@ in
 
     ./security
     ./shell
+    ./system/fontutils.nix
   ]
   ++ lib.optionals (isLinux == "1") [
     ./browser
