@@ -8,6 +8,7 @@
 
     darwin.url = "github:lnl7/nix-darwin/master";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
+    mac-app-util.url = "github:hraban/mac-app-util";
 
     flake-compat.url = "https://flakehub.com/f/edolstra/flake-compat/1.tar.gz";
     nur.url = "github:nix-community/NUR";
@@ -25,6 +26,7 @@
       nix-rice,
       base16,
       home-manager,
+      mac-app-util,
       ...
     }:
     let
@@ -83,6 +85,20 @@
             imports = [
               ./modules
               home-manager.darwinModules.home-manager
+              mac-app-util.darwinModules.default
+              (
+                {
+                  pkgs,
+                  config,
+                  inputs,
+                  ...
+                }:
+                {
+                  home-manager.sharedModules = [
+                    mac-app-util.homeManagerModules.default
+                  ];
+                }
+              )
             ];
             config = {
               nixpkgs.overlays = [
