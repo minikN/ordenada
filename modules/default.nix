@@ -21,6 +21,7 @@ in
     ./base.nix
     ./home.nix
     ./git.nix
+    ./theme.nix
     ./xdg.nix
 
     ./security
@@ -46,7 +47,6 @@ in
     ./mail.nix
     ./playerctl.nix
     ./tailscale.nix
-    ./theme.nix
   ]
   ++ lib.optionals (isDarwin == "1") [ ];
 }

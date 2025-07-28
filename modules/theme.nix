@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  options,
   ...
 }:
 
@@ -11,6 +12,8 @@ with pkgs.lib.base16;
 let
   cfg = config.ordenada.features.theme;
   themeToToggle = if cfg.polarity == "dark" then "light" else "dark";
+  ifDarwin = options: attrs: if builtins.hasAttr "launchd" options then attrs else { };
+  ifLinux = options: attrs: if !builtins.hasAttr "launchd" options then attrs else { };
   defaultThemeSchemes = {
     light = mkSchemeAttrs {
       base00 = "ffffff";
@@ -94,31 +97,35 @@ in
     };
   };
   config = lib.mkMerge [
-    (lib.mkIf cfg.enable {
-      security.sudo.extraRules = [
-        {
-          runAs = "root";
-          groups = [ "wheel" ];
-          commands = [
+    (lib.mkIf cfg.enable (
+      lib.mkMerge [
+        (ifLinux options {
+          security.sudo.extraRules = [
             {
-              command = "/nix/var/nix/profiles/system/specialisation/${themeToToggle}/bin/switch-to-configuration switch";
-              options = [ "NOPASSWD" ];
-            }
-            {
-              command = "/nix/var/nix/profiles/system/bin/switch-to-configuration switch";
-              options = [ "NOPASSWD" ];
+              runAs = "root";
+              groups = [ "wheel" ];
+              commands = [
+                {
+                  command = "/nix/var/nix/profiles/system/specialisation/${themeToToggle}/bin/switch-to-configuration switch";
+                  options = [ "NOPASSWD" ];
+                }
+                {
+                  command = "/nix/var/nix/profiles/system/bin/switch-to-configuration switch";
+                  options = [ "NOPASSWD" ];
+                }
+              ];
             }
           ];
-        }
-      ];
-      specialisation.${themeToToggle}.configuration = {
-        ordenada.features.theme = {
-          scheme = lib.mkForce defaultThemeSchemes.${themeToToggle};
-          wallpaper = lib.mkForce defaultThemeWallpapers.${themeToToggle};
-          polarity = lib.mkForce themeToToggle;
-        };
-      };
-    })
+          specialisation.${themeToToggle}.configuration = {
+            ordenada.features.theme = {
+              scheme = lib.mkForce defaultThemeSchemes.${themeToToggle};
+              wallpaper = lib.mkForce defaultThemeWallpapers.${themeToToggle};
+              polarity = lib.mkForce themeToToggle;
+            };
+          };
+        })
+      ]
+    ))
     {
       home-manager = mkHomeConfig config "theme" (
         user:
@@ -143,13 +150,17 @@ in
             ''
           );
         in
-        {
-          home.packages = [ themeToggler ];
-          xdg.desktopEntries.themeToggler = {
-            name = "Toggle Theme";
-            exec = "${themeToggler}/bin/toggle-theme %U";
-          };
-        }
+        lib.mkMerge [
+          {
+            home.packages = [ themeToggler ];
+          }
+          (ifLinux options {
+            xdg.desktopEntries.themeToggler = {
+              name = "Toggle Theme";
+              exec = "${themeToggler}/bin/toggle-theme %U";
+            };
+          })
+        ]
       );
     }
   ];
