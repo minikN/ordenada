@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  options,
   ...
 }:
 
@@ -9,6 +10,7 @@ with pkgs.lib.ordenada;
 
 let
   inherit (lib) mkEnableOption mkOption types;
+  pinentryPkg = if (builtins.hasAttr "launchd" options) then pkgs.pinentry_mac else pkgs.pinentry-qt;
 in
 {
   options = {
@@ -22,7 +24,7 @@ in
       pinentryPackage = mkOption {
         type = types.nullOr types.package;
         description = "The package for pinentry input.";
-        default = if (config.ordenada.globals.isDarwin == true) then pkgs.pinentry_mac else pkgs.pinentry-qt;
+        default = pinentryPkg;
       };
       defaultTtl = mkOption {
         type = types.int;

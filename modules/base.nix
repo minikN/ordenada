@@ -1,7 +1,8 @@
-{ config, lib, ... }:
+{ config, lib, options, ... }:
 let
   inherit (lib) mkOption types;
   cfg = config.ordenada.features;
+  isDarwin = builtins.hasAttr "launchd" options;
   userModule =
     { name, config, ... }:
     {
@@ -39,10 +40,10 @@ let
         type = types.str;
         description = "Home directory of primary Ordenada user.";
         default =
-          if config.ordenada.globals.isLinux then
-            "/home/${cfg.userInfo.username}"
+          if isDarwin then
+            "/Users/${cfg.userInfo.username}"
           else
-            "/Users/${cfg.userInfo.username}";
+            "/home/${cfg.userInfo.username}";
       };
       gpgPrimaryKey = mkOption {
         type = types.nullOr types.str;

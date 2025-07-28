@@ -45,17 +45,4 @@ in
     ./theme.nix
   ]
   ++ lib.optionals (isDarwin == "1") [ ];
-
-  options = {
-    ordenada.globals.isLinux = mkOption {
-      type = types.bool;
-      description = "Whether ordenada is running under linux.";
-      default = isLinuxPred;
-    };
-    ordenada.globals.isDarwin = mkOption {
-      type = types.bool;
-      description = "Whether ordenada is running under macOS.";
-      default = isDarwinPred;
-    };
-  };
 }
