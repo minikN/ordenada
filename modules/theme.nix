@@ -124,6 +124,11 @@ in
             };
           };
         })
+        # (ifDarwin options {
+        #   security.sudo.extraConfig = ''
+        #       %admin ALL=(root) NOPASSWD: /nix/var/nix/profiles/system/specialisation/${themeToToggle}/bin/switch-to-configuration switch, NOPASSWD: /nix/var/nix/profiles/system/bin/switch-to-configuration switch
+        #   '';
+        # })
       ]
     ))
     {
