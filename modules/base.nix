@@ -50,6 +50,22 @@ let
         description = "The primary GnuPG key for this user.";
         default = null;
       };
+
+      defaultLocale = mkOption {
+        type = types.nullOr types.str;
+        description = "The default locale used for this user.";
+        default = "en_US.UTF-8";
+      };
+      timezone = mkOption {
+        type = types.nullOr types.str;
+        description = "The timezone used for this user.";
+        default = null;
+      };
+      keymap = mkOption {
+        type = types.nullOr types.str;
+        description = "The keymap used for this user.";
+        default = "us";
+      };
     };
   };
 in

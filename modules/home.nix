@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  options,
   ...
 }:
 
@@ -16,6 +17,8 @@ let
     ;
   features = config.ordenada.features;
   cfg = features.home;
+  ifDarwin = options: attrs: if builtins.hasAttr "launchd" options then attrs else { };
+  ifLinux = options: attrs: if !builtins.hasAttr "launchd" options then attrs else { };
 in
 {
   options = {
@@ -35,30 +38,45 @@ in
   };
   config = mkMerge [
     (mkIf cfg.enable (mkMerge [
+      ## All platforms
       {
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
         home-manager.backupFileExtension = "backup";
+        time.timeZone = mkIf (features.userInfo.timezone != null) features.userInfo.timezone;
       }
-      (mkIf (config.ordenada.globals.isDarwin == true && config.ordenada.globals.shell == null) {
-        ## On macOS, .profile isn't sourced by default, so source it if shell isn't
-        ## set so other modules work properly
-        programs.zsh.enable =  true;
-        programs.zsh.loginShellInit = ''
-          [[ -f "$HOME/.profile" ]] && source "$HOME/.profile"
-        '';
-      })
-      (mkIf (config.ordenada.globals.isLinux == true) {
+
+      ## darwin
+      (ifDarwin options (mkMerge [
+        {
+          environment.variables = mkIf (features.userInfo.defaultLocale != null) {
+            LANG = features.userInfo.defaultLocale;
+            LC_ALL = features.userInfo.defaultLocale;
+          };
+        }
+        (mkIf (config.ordenada.globals.shell == null) {
+          ## On macOS, .profile isn't sourced by default, so source it if shell isn't
+          ## set so other modules work properly
+          programs.zsh.enable = true;
+          programs.zsh.loginShellInit = ''
+            [[ -f "$HOME/.profile" ]] && source "$HOME/.profile"
+          '';
+        })
+      ]))
+
+      ## linux
+      (ifLinux options {
+        targets.genericLinux.enable = true;
         ## Starting the chosen wm on the desired tty if enabled
         environment.loginShellInit = mkIf (cfg.autoStartWmOnTty != null) ''
           [[ $(tty) == ${cfg.autoStartWmOnTty} ]] && exec ${config.ordenada.globals.wm}
         '';
+        i18n.defaultLocale = mkIf (features.userInfo.defaultLocale != null) features.userInfo.defaultLocale;
       })
     ]))
     {
       home-manager = mkHomeConfig config "home" (user: {
         programs.home-manager.enable = true;
-        targets.genericLinux.enable = config.ordenada.globals.isLinux == true;
         home.stateVersion = "24.05";
 
         ## If the user isn't using any of the shell modules, add the session-vars to .profile
@@ -69,13 +87,16 @@ in
       });
 
       users = mkMerge [
-        (mkIf (config.ordenada.globals.isLinux == true) (
+        ## linux
+        (ifLinux options (
           mkHomeConfig config "home" (user: {
             isNormalUser = true;
             extraGroups = [ "wheel" ] ++ user.features.home.extraGroups;
           })
         ))
-        (mkIf (config.ordenada.globals.isDarwin == true) (
+
+        ## darwin
+        (ifDarwin options (
           mkHomeConfig config "home" (user: {
             home = features.userInfo.homeDirectory;
           })
