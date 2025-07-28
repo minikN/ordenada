@@ -66,7 +66,6 @@ in
 
       ## linux
       (ifLinux options {
-        targets.genericLinux.enable = true;
         ## Starting the chosen wm on the desired tty if enabled
         environment.loginShellInit = mkIf (cfg.autoStartWmOnTty != null) ''
           [[ $(tty) == ${cfg.autoStartWmOnTty} ]] && exec ${config.ordenada.globals.wm}
@@ -76,6 +75,14 @@ in
     ]))
     {
       home-manager = mkHomeConfig config "home" (user: {
+        targets = mkMerge [
+          (ifLinux options {
+            genericLinux.enable = true;
+          })
+          (ifDarwin options {
+            ## darwin = {...};
+          })
+        ];
         programs.home-manager.enable = true;
         home.stateVersion = "24.05";
 
