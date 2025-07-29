@@ -49,6 +49,7 @@ in
       ## darwin
       (ifDarwin options (mkMerge [
         {
+          system.primaryUser = features.userInfo.username;
           environment.variables = mkIf (features.userInfo.defaultLocale != null) {
             LANG = features.userInfo.defaultLocale;
             LC_ALL = features.userInfo.defaultLocale;

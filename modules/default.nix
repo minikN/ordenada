@@ -11,10 +11,8 @@ let
 
   isLinux =
     lib.strings.hasPrefix "x86_64-linux" system || lib.strings.hasPrefix "aarch64-linux" system;
-  isDarwinPred =
+  isDarwin =
     lib.strings.hasPrefix "x86_64-darwin" system || lib.strings.hasPrefix "aarch64-darwin" system;
-
-  isDarwin = if isDarwinPred == "1" then true else false;
 in
 {
   imports = [
@@ -48,5 +46,7 @@ in
     ./playerctl.nix
     ./tailscale.nix
   ]
-  ++ lib.optionals (isDarwin == "1") [ ];
+  ++ lib.optionals (isDarwin) [
+    ./package-management/homebrew.nix
+  ];
 }
