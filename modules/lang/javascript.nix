@@ -149,6 +149,7 @@ with pkgs.lib.ordenada;
               tree-sitter-typescript
             ]
           ))
+          markdown-mode
           web-mode
         ];
       };
