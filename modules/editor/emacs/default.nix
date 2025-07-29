@@ -28,6 +28,7 @@ in
     ./dired.nix
     ./ebdb.nix
     ./embark.nix
+    ./evil.nix
     ./eshell.nix
     ./exec-path.nix
     ./help.nix
