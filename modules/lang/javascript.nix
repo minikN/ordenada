@@ -51,7 +51,6 @@ with pkgs.lib.ordenada;
           (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
           (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
           (add-to-list 'auto-mode-alist '("\\.jsx\\'" . jsx-ts-mode))
-          (add-to-list 'major-mode-remap-alist '(json-mode . json-ts-mode))
           (add-to-list 'auto-mode-alist '("\\(\\.[c|m]js[m]?\\|\\.har\\)\\'" . js-ts-mode) t)
           (define-derived-mode jsx-ts-mode tsx-ts-mode "JavaScript[JSX]")
 
@@ -140,14 +139,12 @@ with pkgs.lib.ordenada;
           eslint-fix
           flymake-eslint
           js2-mode
-          json-mode
           npm-mode
           nodejs-repl
           (treesit-grammars.with-grammars (
             grammars: with grammars; [
               tree-sitter-css
               tree-sitter-javascript
-              tree-sitter-json
               tree-sitter-tsx
               tree-sitter-typescript
             ]
