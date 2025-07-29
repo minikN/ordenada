@@ -29,6 +29,7 @@ in
     ./ebdb.nix
     ./embark.nix
     ./eshell.nix
+    ./exec-path.nix
     ./help.nix
     ./gnus.nix
     ./keymaps.nix
