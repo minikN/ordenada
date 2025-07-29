@@ -15,6 +15,7 @@ let
     mkMerge
     mkIf
     ;
+  cfg = config.ordenada.features.keyboard;
   ifLinux = options: attrs: if !builtins.hasAttr "launchd" options then attrs else { };
   ifDarwin = options: attrs: if builtins.hasAttr "launchd" options then attrs else { };
 in
@@ -53,6 +54,10 @@ in
   config = mkMerge [
     (ifLinux options {
       console.keyMap = config.ordenada.features.keyboard.layout.name;
+    })
+    (ifDarwin options {
+      system.keyboard.enableKeyMapping = true;
+      system.keyboard.remapCapsLockToControl = builtins.elem "ctrl:nocaps" cfg.layout.options;
     })
     ({
       home-manager = mkHomeConfig config "keyboard" (user: {
