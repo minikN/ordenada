@@ -22,6 +22,8 @@ in
     ./theme.nix
     ./xdg.nix
 
+    ./editor
+    ./lang
     ./security
     ./shell
     
@@ -33,9 +35,7 @@ in
   ++ lib.optionals (isLinux) [
     ./browser
     ./development
-    ./editor
     ./messaging
-    ./lang
     ./scripts
     ./system
     ./virtualization
