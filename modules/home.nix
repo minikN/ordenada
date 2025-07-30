@@ -75,24 +75,31 @@ in
       })
     ]))
     {
-      home-manager = mkHomeConfig config "home" (user: {
-        targets = mkMerge [
-          (ifLinux options {
-            genericLinux.enable = true;
-          })
-          (ifDarwin options {
-            ## darwin = {...};
-          })
-        ];
-        programs.home-manager.enable = true;
-        home.stateVersion = "24.05";
+      home-manager = mkHomeConfig config "home" (
+        user:
+        (mkMerge [
+          ## All platforms
+          {
+            programs.home-manager.enable = true;
+            home.stateVersion = "24.05";
 
-        ## If the user isn't using any of the shell modules, add the session-vars to .profile
-        ## ourselves so other modules work properly
-        home.file.".profile".text = mkIf (config.ordenada.globals.shell == null) ''
-          . "${config.home-manager.users.${user.name}.home.profileDirectory}/etc/profile.d/hm-session-vars.sh"
-        '';
-      });
+            ## If the user isn't using any of the shell modules, add the session-vars to .profile
+            ## ourselves so other modules work properly
+            home.file.".profile".text = mkIf (config.ordenada.globals.shell == null) ''
+              . "${config.home-manager.users.${user.name}.home.profileDirectory}/etc/profile.d/hm-session-vars.sh"
+            '';
+          }
+
+          ## Linux
+          (ifLinux options {
+            targets.genericLinux.enable = true;
+          })
+
+          ## Darwin
+          (ifDarwin options {
+          })
+        ])
+      );
 
       users = mkMerge [
         ## linux
