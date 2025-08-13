@@ -82,7 +82,7 @@ let
     )}
   '';
 
-  xCodeScript = pkgs.writeShellScript "manage-xcodes" ''
+  xcodeScript = pkgs.writeShellScript "manage-xcodes" ''
     set -euo pipefail
 
     export HOME=${features.userInfo.homeDirectory};
@@ -104,7 +104,7 @@ let
         if ! echo "$installed_versions" | grep -q "^${v}$"; then
           /usr/bin/sudo -u $USER xcodes install "${v}" --experimental-unxip --empty-trash --no-superuser
         fi
-      '') xCodeVersions
+      '') xcodeVersions
     )}
 
     # Refresh installed versions after potential installs
@@ -112,7 +112,7 @@ let
 
     # Uninstall versions not in desired list
     for ver in $installed_versions; do
-      case " ${lib.concatStringsSep " " xCodeVersions} " in
+      case " ${lib.concatStringsSep " " xcodeVersions} " in
         *" $ver "*) ;;
         *)
           /usr/bin/sudo sudo -u $USER xcodes uninstall "$ver --empty-trash"
@@ -121,22 +121,22 @@ let
     done
 
     ${
-      if (xCodeActiveVersion != null) then
+      if (xcodeActiveVersion != null) then
         let
-          activeXcodePath = "/Applications/Xcode-${xCodeActiveVersion}.0.app/Contents/Developer";
+          activeXcodePath = "/Applications/Xcode-${xcodeActiveVersion}.0.app/Contents/Developer";
         in
         ''
           # Select active version
 
           if [[ $(xcode-select -p) != "${activeXcodePath}" ]]; then
-            xcodes select "${xCodeActiveVersion}"
+            xcodes select "${xcodeActiveVersion}"
             xcode-select -s "${activeXcodePath}"
             sudo xcodebuild -license accept
           fi
 
           # Ensure active version is installed
-          if ! echo "$installed_versions" | grep -q "^${xCodeActiveVersion}$"; then
-            echo "Error: xCodeActiveVersion '${xCodeActiveVersion}' is not installed."
+          if ! echo "$installed_versions" | grep -q "^${xcodeActiveVersion}$"; then
+            echo "Error: Xcode active version '${xcodeActiveVersion}' is not installed."
             exit 1
           fi
         ''
@@ -206,18 +206,14 @@ in
   options = {
     ordenada.features.ios = {
       enable = mkEnableOption "the iOS feature";
-      xCodeVersions = mkOption {
+      xcodeVersions = mkOption {
         type = types.listOf types.str;
-        default = [
-          "16.4"
-          "16.3"
-          "16.2"
-        ];
+        default = [ ];
         description = "The XCode versions to install.";
       };
-      xCodeActiveVersion = mkOption {
+      xcodeActiveVersion = mkOption {
         type = types.nullOr types.str;
-        default = "16.4";
+        default = null;
         description = "The XCode version to use.";
       };
       simulators = lib.mkOption {
@@ -240,13 +236,7 @@ in
             };
           }
         );
-        default = [
-          {
-            device = "iPhone-16-Pro";
-            os = "iOS 18.5";
-            bootOnLogin = true;
-          }
-        ];
+        default = [ ];
         description = "List of simulators to create.";
       };
     };
