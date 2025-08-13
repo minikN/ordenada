@@ -22,19 +22,19 @@ in
     ./theme.nix
     ./xdg.nix
 
+    ./development
     ./editor
     ./lang
     ./security
     ./shell
-    
+
     ./system/fontutils.nix
     ./system/keyboard.nix
-    
+
     ./terminal
   ]
   ++ lib.optionals (isLinux) [
     ./browser
-    ./development
     ./messaging
     ./scripts
     ./system
