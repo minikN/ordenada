@@ -16,9 +16,9 @@ in
   imports = [
     ./compile.nix
     ./direnv.nix
+    ./android.nix
   ]
   ++ lib.optionals (isLinux) [
-    ./android.nix
   ]
   ++ lib.optionals (isDarwin) [
     ./ios.nix
