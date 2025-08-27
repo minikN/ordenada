@@ -31,6 +31,7 @@ in
     ./system/fontutils.nix
     ./system/keyboard.nix
 
+    ./wm
     ./terminal
   ]
   ++ lib.optionals (isLinux) [
@@ -39,7 +40,6 @@ in
     ./scripts
     ./system
     ./virtualization
-    ./wm
 
     ./gtk.nix
     ./mail.nix
