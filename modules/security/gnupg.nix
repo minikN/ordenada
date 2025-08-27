@@ -44,6 +44,7 @@ in
         maxCacheTtlSsh = defaultTtl;
         enableSshSupport = true;
         pinentry.package = pinentryPackage;
+        noAllowExternalCache = true;
       };
       programs = {
         gpg = {
