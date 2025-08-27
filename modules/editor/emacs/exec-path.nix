@@ -26,6 +26,8 @@ with pkgs.lib.ordenada;
               "SSH_AGENT_PID"
               "GPG_AGENT_INFO"
               "GNUPGHOME"
+              "PASSWORD_STORE_DIR"
+              "SUDO_ASKPASS"
               "LANG"
               "LC_CTYPE"
               "NIX_SSL_CERT_FILE"
