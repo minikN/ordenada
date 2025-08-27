@@ -100,6 +100,7 @@ let
           "hw.gpu.enabled" = "true";
           "hw.gpu.mode" = "host";
           "hw.ramSize" = "2048";
+          "hw.keyboard" = "true";
 
           "hw.lcd.height" = emu.height;
           "hw.lcd.width" = emu.width;
