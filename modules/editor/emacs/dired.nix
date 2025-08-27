@@ -75,12 +75,13 @@ in
             (setopt dired-recursive-deletes 'always)
             (setopt dired-clean-confirm-killing-deleted-buffers nil)
             (setopt dired-recursive-copies 'always))
+            (setopt insert-directory-program "${pkgs.coreutils}/bin/ls")
 
           (with-eval-after-load 'dired-rsync
             (setopt dired-rsync-options
                     "--exclude .git/ --exclude .gitignore -az --info=progress2 --delete"))
           (with-eval-after-load 'ls-lisp
-            (setopt ls-lisp-use-insert-directory-program nil))
+            (setopt ls-lisp-use-insert-directory-program "${pkgs.coreutils}/bin/ls"))
         '';
         elispPackages = with pkgs.emacsPackages; [
           all-the-icons-dired
