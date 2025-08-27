@@ -2,11 +2,15 @@
   config,
   lib,
   pkgs,
+  options,
   ...
 }:
 
 with pkgs.lib.ordenada;
 
+let
+  ifLinux = options: attrs: if !builtins.hasAttr "launchd" options then attrs else { };
+in
 {
   options = {
     ordenada.features.xdg = {
@@ -45,6 +49,13 @@ with pkgs.lib.ordenada;
         lib.mkMerge [
           {
             enable = true;
+            cacheHome = lib.mkOptionDefault baseDirs.cacheHome;
+            configHome = lib.mkOptionDefault baseDirs.configHome;
+            dataHome = lib.mkOptionDefault baseDirs.dataHome;
+            stateHome = lib.mkOptionDefault baseDirs.stateHome;
+            userDirs = userDirs;
+          }
+          (ifLinux options {
             mime.enable = true;
             mimeApps.enable = true;
             portal = {
@@ -60,18 +71,11 @@ with pkgs.lib.ordenada;
                 ];
               };
             };
-            cacheHome = lib.mkOptionDefault baseDirs.cacheHome;
-            configHome = lib.mkOptionDefault baseDirs.configHome;
-            dataHome = lib.mkOptionDefault baseDirs.dataHome;
-            stateHome = lib.mkOptionDefault baseDirs.stateHome;
-            userDirs = userDirs;
-          }
-          {
             userDirs = {
               enable = true;
               createDirectories = true;
             };
-          }
+          })
         ];
     });
   };
