@@ -126,11 +126,11 @@ in
               (setopt auto-save-list-file-prefix
                       (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
                               "/emacs/auto-save-list"))
-
               (setq auto-save-file-name-transforms
                       `((".*" ,(concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
                               "/emacs/auto-save-list/") t)))
-
+              (add-to-list 'auth-sources (concat (or (getenv "XDG_STATE_HOME") "~/.local/state")
+                              "/authinfo.gpg"))
               (save-place-mode 1)
               (setopt save-place-file
                       (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
