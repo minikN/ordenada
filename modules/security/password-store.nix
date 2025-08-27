@@ -41,11 +41,17 @@ in {
             (keymap-set ordenada-app-map "p" #'pass))
 
           (with-eval-after-load 'auth-source
-            (auth-source-pass-enable))
+            (auth-source-pass-enable)
+            (setopt auth-source-pass-filename "${cfg.storeDir}")
+          )
 
           (autoload 'password-store-dir "password-store")
           (autoload 'password-store-list "password-store")
           (autoload 'consult--read "consult")
+
+          (setopt password-cache t)
+          (setopt password-cache-expiry 3600)
+
 
           (defun ordenada-password-store-consult (arg pass)
             "Interactively search the password store."
