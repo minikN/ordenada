@@ -46,6 +46,16 @@ with pkgs.lib.ordenada;
               (flymake-eslint-enable))
             (add-to-list 'mode-line-misc-info `(flymake-mode (" " flymake-mode-line-counters " "))))
 
+          (defun eglot-code-action-add-missing-imports-ts (beg &optional end)
+            "Executes `source.addMissingImports.ts' between BEG and END."
+            (interactive (eglot--code-action-bounds))
+            (eglot-code-actions beg end "source.addMissingImports.ts" t))
+
+          (defun eglot-code-action-remove-unused-imports-ts (beg &optional end)
+            "Executes `source.removeUnusedImports.ts' between BEG and END."
+            (interactive (eglot--code-action-bounds))
+            (eglot-code-actions beg end "source.removeUnusedImports.ts" t))
+
           (add-to-list 'major-mode-remap-alist '(javascript-mode . js-ts-mode))
           (add-to-list 'major-mode-remap-alist '(typescript-mode . tsx-ts-mode))
           (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
@@ -78,6 +88,10 @@ with pkgs.lib.ordenada;
             '("repl" . ordenada-javascript-nodejs-repl-mode-command-map))
           (keymap-set ordenada-javascript-mode-map "C-c f"
             '("Format buffer" . eslint-fix))
+          (keymap-set ordenada-javascript-mode-map "C-c c i"
+            #'eglot-code-action-remove-unused-imports-ts)
+          (keymap-set ordenada-javascript-mode-map "C-c c I"
+            #'eglot-code-action-add-missing-imports-ts)
 
           (mapcar (lambda (hook)
                     (add-hook (intern (concat (symbol-name hook) "-hook")) 'ordenada-javascript-mode))
