@@ -72,6 +72,7 @@ with pkgs.lib.ordenada;
               (add-hook 'flymake-diagnostic-functions 'eglot-flymake-backend nil t)
               (eglot-ensure)
               (setq indent-tabs-mode nil)
+              (setq tab-width 4)
               (ordenada-javascript--setup-electric-pairs-for-jsx-tsx)
               (js2-minor-mode)
               (js2-imenu-extras-mode)
