@@ -6,7 +6,9 @@
 }:
 
 with pkgs.lib.ordenada;
-
+let
+  features = config.ordenada.features;
+in
 {
   options.ordenada.features.javascript = {
     enable = lib.mkEnableOption "the JavaScript feature";
@@ -73,6 +75,11 @@ with pkgs.lib.ordenada;
               (eglot-ensure)
               (setq indent-tabs-mode nil)
               (setq tab-width 4)
+
+              ${mkIf (features.emacs.corfu.enable != null) ''
+                (corfu-mode 1)
+              ''}
+
               (ordenada-javascript--setup-electric-pairs-for-jsx-tsx)
               (js2-minor-mode)
               (js2-imenu-extras-mode)
