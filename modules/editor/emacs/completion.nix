@@ -29,7 +29,7 @@ with pkgs.lib.ordenada;
           (advice-add 'completing-read-multiple :filter-args #'ordenada-completion-crm-indicator)
 
           (with-eval-after-load 'minibuffer
-            (setopt tab-always-indent 'complete)
+            (setopt tab-always-indent nil)
             (setopt minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
             (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
             (setopt completion-show-help nil)
