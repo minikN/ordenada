@@ -6,7 +6,9 @@
 }:
 
 with pkgs.lib.ordenada;
-
+let
+  cfg = config.ordenada.features.emacs.corfu;
+in
 {
   options = {
     ordenada.features.emacs.corfu = {
@@ -16,10 +18,17 @@ with pkgs.lib.ordenada;
         description = "List of modes where Corfu should be enabled.";
         default = [ ];
       };
+      autoShow = lib.mkOption {
+        type = lib.types.bool;
+        description = "Whether the corfu popup should appear automatically while typing.";
+        default = true;
+      };
     };
   };
   config = {
-    home-manager = mkHomeConfig config "emacs.corfu" (user: {
+    home-manager = mkHomeConfig config "emacs.corfu" (user:
+      with user.features.emacs.corfu;
+      {
       programs.emacs = pkgs.lib.ordenada.mkElispConfig {
         name = "ordenada-corfu";
         config = with user.features.emacs.corfu; ''
@@ -33,7 +42,8 @@ with pkgs.lib.ordenada;
               (keymap-set map "S-TAB" #'corfu-previous)
               (keymap-set map "M-p" #'corfu-doc-scroll-down)
               (keymap-set map "M-n" #'corfu-doc-scroll-up)
-              (keymap-set map "M-d" #'corfu-doc-toggle))
+              (keymap-set map "M-d" #'corfu-info-documentation)
+              (keymap-set map "M-l" #'corfu-info-location))
 
             (defun ordenada-corfu-move-to-minibuffer ()
               (interactive)
@@ -52,7 +62,9 @@ with pkgs.lib.ordenada;
             (setopt corfu-auto-prefix 2)
             (setopt corfu-min-width 60)
             (setopt corfu-cycle t)
-            (setopt corfu-auto t)
+            ${if autoShow then ''
+              (setopt corfu-auto t)
+            '' else ""}
             (setopt global-corfu-modes '(${toString globalModes}))
             (global-corfu-mode 1)
             (add-hook 'after-init-hook #'corfu-candidate-overlay-mode)
