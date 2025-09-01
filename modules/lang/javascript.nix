@@ -71,7 +71,10 @@ in
             :group 'ordenada-javascript :keymap ordenada-javascript-mode-map
             (when ordenada-javascript-mode
               (ordenada-javascript--disable-eglot-parts)
+
               (add-hook 'flymake-diagnostic-functions 'eglot-flymake-backend nil t)
+              (add-hook 'js2-mode-hook #'js2-refactor-mode)
+
               (eglot-ensure)
               (setq indent-tabs-mode nil)
               (setq tab-width 4)
@@ -92,6 +95,7 @@ in
             (keymap-set map "C-c" #'nodejs-repl-send-buffer)
             (keymap-set map "C-l" #'nodejs-repl-load-file)
             (keymap-set map "C-z" #'nodejs-repl-switch-to-repl))
+
           (keymap-set ordenada-javascript-mode-map "C-c C-r"
             '("repl" . ordenada-javascript-nodejs-repl-mode-command-map))
           (keymap-set ordenada-javascript-mode-map "C-c f"
@@ -148,6 +152,11 @@ in
             (setopt js2-highlight-level 3)
             (setopt js2-idle-timer-delay 0.15))
 
+          (with-eval-after-load 'js2-refactor
+            (setopt js2r-prefer-let-over-var t)
+            (setopt js2r-prefered-quote-type 2)
+            (js2r-add-keybindings-with-prefix "C-c r"))
+
           (with-eval-after-load 'web-mode
             (setopt web-mode-markup-indent-offset 2)
             (setopt web-mode-css-indent-offset 2)
@@ -161,6 +170,7 @@ in
           eslint-fix
           flymake-eslint
           js2-mode
+          js2-refactor
           npm-mode
           nodejs-repl
           (treesit-grammars.with-grammars (
