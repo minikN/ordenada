@@ -252,7 +252,6 @@ in
           with pkgs;
           [
             xcodes
-            cocoapods
           ]
           ++ (lib.map mkSimulatorBin cfg.simulators);
 
