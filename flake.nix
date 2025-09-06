@@ -10,6 +10,17 @@
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     mac-app-util.url = "github:hraban/mac-app-util";
 
+
+    emacs-overlay = {
+      url = "github:nix-community/emacs-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    emacs-darwin = {
+      url = "github:nix-giant/nix-darwin-emacs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     flake-compat.url = "https://flakehub.com/f/edolstra/flake-compat/1.tar.gz";
     nur.url = "github:nix-community/NUR";
     nix-rice.url = "github:bertof/nix-rice";
@@ -27,6 +38,9 @@
       base16,
       home-manager,
       mac-app-util,
+
+      emacs-overlay,
+      emacs-darwin,
       ...
     }:
     let
@@ -74,6 +88,7 @@
                 overlay
                 nur.overlays.default
                 nix-rice.overlays.default
+                emacs-overlay.overlays.default
                 (final: prev: { inherit inputs; })
               ];
             };
@@ -105,6 +120,8 @@
                 overlay
                 nur.overlays.default
                 nix-rice.overlays.default
+                emacs-darwin.overlays.emacs
+                emacs-overlay.overlays.package
                 (final: prev: { inherit inputs; })
               ];
             };

@@ -10,10 +10,11 @@ with pkgs.lib.ordenada;
 let
   inherit (lib)
     mkEnableOption
-    mkPackageOption
     mkOption
     types
     ;
+
+  isDarwin = builtins.hasAttr "launchd" options;
 in
 {
   imports = [
@@ -55,7 +56,13 @@ in
   options = {
     ordenada.features.emacs = {
       enable = mkEnableOption "the Emacs feature";
-      package = mkPackageOption pkgs "emacs" { default = "emacs30-pgtk"; };
+      #package = mkPackageOption pkgs "emacs" { default = "emacs30-pgtk"; };
+      package = mkOption {
+        type = types.package;
+        default = if (isDarwin != null)
+                  then pkgs.emacs-30
+                  else pkgs.emacs30-pgtk;
+      };
       advancedUser = mkEnableOption "advanced user mode for Emacs features";
       defaultThemes = mkOption {
         type = types.attrs;
