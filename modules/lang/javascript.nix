@@ -86,6 +86,7 @@ in
               (ordenada-javascript--setup-electric-pairs-for-jsx-tsx)
               (js2-minor-mode)
               (js2-imenu-extras-mode)
+              (js2-refactor-mode)
               (npm-mode)))
 
           (let ((map ordenada-javascript-nodejs-repl-mode-command-map))
