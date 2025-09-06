@@ -87,6 +87,10 @@ in
               (js2-minor-mode)
               (js2-imenu-extras-mode)
               (js2-refactor-mode)
+
+              (local-unset-key (kbd "RET"))
+              (local-set-key (kbd "RET") 'js2-line-break)
+
               (npm-mode)))
 
           (let ((map ordenada-javascript-nodejs-repl-mode-command-map))
