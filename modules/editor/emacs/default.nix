@@ -171,6 +171,25 @@ in
               (add-hook 'after-init-hook #'savehist-mode)
               (run-with-idle-timer 30 t #'savehist-save)
 
+              (defun ordenada-smart-backspace ()
+                "Delete all whitespace between POINT and the previous non-whitespace
+                character. If there is no non-whitespace character between POINT and the
+                beginning of the line, it'll delete until the beginning. Else, it'll
+                execute `delete-backward-char'."
+                (interactive)
+                (let ((pos (point))
+                      (bol (line-beginning-position)))
+                  (cond
+                    ((string-match-p "\\`[ \t]+\\'" (buffer-substring bol pos))
+                    (delete-region bol pos))
+
+                  ((looking-back "[ \t]+" bol)
+                    (re-search-backward "[^ \t]" bol t)
+                    (delete-region (1+ (point)) pos))
+
+                  (t
+                  (delete-backward-char 1)))))
+
               (show-paren-mode 1)
               (subword-mode 1)
               (setq-default indent-tabs-mode nil)
@@ -183,6 +202,7 @@ in
               (add-hook 'after-save-hook 'copyright-update)
               (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
+              (keymap-global-set "C-<backspace>" #'ordenada-smart-backspace)
               (keymap-global-set "M-K" #'kill-whole-line)
               (keymap-global-set "M-c" #'capitalize-dwim)
               (keymap-global-set "M-l" #'downcase-dwim)
