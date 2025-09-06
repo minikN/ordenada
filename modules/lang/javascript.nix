@@ -42,6 +42,32 @@ in
             (setq-local electric-pair-pairs (append electric-pair-pairs '((60 . 62))))
             (setq-local electric-pair-text-pairs electric-pair-pairs))
 
+          (defun ordenada-javascript--next-line-function-or-arrow-p ()
+            "Return t if the next line contains 'function' or '=>'."
+            (save-excursion
+              (forward-line 1)
+              (let ((line (thing-at-point 'line t)))
+                (when line
+                  (or (and (string-match-p "\\<function\\>" line) t)
+                      (and (string-match-p "=>" line) t))))))
+
+          (defun ordenada-javascript-jsdoc-or-line-break ()
+            "Inserts JSDoc at point if line matches `/**'. Otherwise executes `js2-line-break'
+          at given point."
+            (interactive)
+            (let ((p (point)))
+              (beginning-of-line)
+              (if (and (looking-at-p "^[[:blank:]]*/\\*\\*$") (ordenada-javascript--next-line-function-or-arrow-p))
+          	(progn
+          	  (kill-line t)
+          	  (jsdoc)
+          	  (goto-char (search-backward-regexp "^/\\*\\*$"))
+          	  (next-line)
+          	  (end-of-line))
+            (progn
+          	  (goto-char p)
+          	  (funcall 'js2-line-break)))))
+
           (defun ordenada-javascript--setup-flymake-for-eglot ()
             (flymake-mode t)
             (when (derived-mode-p 'typescript-ts-mode 'js-ts-mode 'tsx-ts-mode 'jsx-ts-mode)
@@ -89,7 +115,7 @@ in
               (js2-refactor-mode)
 
               (local-unset-key (kbd "RET"))
-              (local-set-key (kbd "RET") 'js2-line-break)
+              (local-set-key (kbd "RET") 'ordenada-javascript-jsdoc-or-line-break)
 
               (npm-mode)))
 
@@ -102,9 +128,9 @@ in
             (keymap-set map "C-z" #'nodejs-repl-switch-to-repl))
 
           (keymap-set ordenada-javascript-mode-map "C-c C-r"
-            '("repl" . ordenada-javascript-nodejs-repl-mode-command-map))
+                      '("repl" . ordenada-javascript-nodejs-repl-mode-command-map))
           (keymap-set ordenada-javascript-mode-map "C-c f"
-            '("Format buffer" . eslint-fix))
+                      '("Format buffer" . eslint-fix))
           (keymap-set ordenada-javascript-mode-map "C-c c i"
                       #'ordenada-javascript--eglot-code-action-missing-imports)
           (keymap-set ordenada-javascript-mode-map "C-c c I"
@@ -131,9 +157,9 @@ in
                 (js-ts-mode :language-id "javascript")
                 (tsx-ts-mode :language-id "typescriptreact")
                 (typescript-ts-mode :language-id "typescript")) .
-               ("${pkgs.nodePackages.typescript-language-server}/bin/typescript-language-server" "--stdio"
-                :initializationOptions
-                (:tsserver (:path "${pkgs.nodePackages.typescript}/lib/node_modules/typescript/lib"))))))
+                ("${pkgs.nodePackages.typescript-language-server}/bin/typescript-language-server" "--stdio"
+                 :initializationOptions
+                 (:tsserver (:path "${pkgs.nodePackages.typescript}/lib/node_modules/typescript/lib"))))))
 
           (with-eval-after-load 'npm-mode
             (fset 'npm-mode-command-keymap npm-mode-command-keymap)
@@ -176,6 +202,7 @@ in
           flymake-eslint
           js2-mode
           js2-refactor
+          jsdoc
           npm-mode
           nodejs-repl
           (treesit-grammars.with-grammars (
@@ -184,6 +211,7 @@ in
               tree-sitter-javascript
               tree-sitter-tsx
               tree-sitter-typescript
+              tree-sitter-jsdoc
             ]
           ))
           markdown-mode
