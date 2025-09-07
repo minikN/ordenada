@@ -55,22 +55,28 @@ in
                   (or (and (string-match-p "\\<function\\>" line) t)
                       (and (string-match-p "=>" line) t))))))
 
-          (defun ordenada-javascript-jsdoc-or-line-break ()
-            "Inserts JSDoc at point if line matches `/**'. Otherwise executes `js2-line-break'
-          at given point."
-            (interactive)
-            (let ((p (point)))
-              (beginning-of-line)
-              (if (and (looking-at-p "^[[:blank:]]*/\\*\\*$") (ordenada-javascript--next-line-function-or-arrow-p))
-          	(progn
-          	  (kill-line t)
-          	  (jsdoc)
-          	  (goto-char (search-backward-regexp "^/\\*\\*$"))
-          	  (next-line)
-          	  (end-of-line))
-            (progn
-          	  (goto-char p)
-          	  (funcall 'js2-line-break)))))
+           (defun ordenada-javascript-jsdoc-or-line-break ()
+             "Inserts JSDoc at point if line matches `/**'. Otherwise executes `js2-line-break'
+             at given point."
+             (interactive)
+             (let ((p (point)))
+               (beginning-of-line)
+               (if (and (looking-at-p "^[[:blank:]]*/\\*\\*$")
+                        (ordenada-javascript--next-line-function-or-arrow-p))
+                 (progn
+                   (kill-line)
+                   (next-line)
+                   (jsdoc)
+                   (goto-char (search-backward-regexp "^/\\*\\*$"))
+                   (beginning-of-line)
+                   (backward-delete-char 1)
+                   (next-line)
+                   (end-of-line))
+                 (progn
+                   (goto-char p)
+                   (if (string-match-p "comment" (treesit-node-type (treesit-node-at p 'javascript)))
+                       (funcall 'js2-line-break)
+                     (funcall 'newline-and-indent))))))
 
           (defun ordenada-javascript--setup-flymake-for-eglot ()
             (flymake-mode t)
