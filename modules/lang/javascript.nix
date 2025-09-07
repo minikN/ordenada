@@ -32,7 +32,11 @@ in
           (defvar ordenada-javascript-mode-map (make-sparse-keymap))
           (defvar ordenada-javascript-nodejs-repl-mode-command-map nil
             "Map to bind `nodejs-repl' commands under.")
+          (defvar ordenada-javascript-jtsx-command-map nil
+            "Map to bind `jtsx' commands under.")
+
           (define-prefix-command 'ordenada-javascript-nodejs-repl-mode-command-map)
+          (define-prefix-command 'ordenada-javascript-jtsx-command-map)
 
           (defun ordenada-javascript--disable-eglot-parts ()
             (setq-local eglot-stay-out-of '(flymake)))
@@ -84,12 +88,16 @@ in
             (interactive (eglot--code-action-bounds))
             (eglot-code-actions beg end "source.removeUnusedImports.ts" t))
 
-          (add-to-list 'major-mode-remap-alist '(javascript-mode . js-ts-mode))
-          (add-to-list 'major-mode-remap-alist '(typescript-mode . tsx-ts-mode))
-          (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
-          (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
-          (add-to-list 'auto-mode-alist '("\\.jsx\\'" . jsx-ts-mode))
-          (add-to-list 'auto-mode-alist '("\\(\\.[c|m]js[m]?\\|\\.har\\)\\'" . js-ts-mode) t)
+          (add-to-list 'major-mode-remap-alist '(javascript-mode . jtsx-jsx-mode))
+          (add-to-list 'major-mode-remap-alist '(typescript-mode . jtsx-tsx-mode))
+
+          (add-to-list 'auto-mode-alist '("\\.tsx\\'" . jtsx-tsx-mode))
+          (add-to-list 'auto-mode-alist '("\\.jsx\\'" . jtsx-jsx-mode))
+
+          (add-to-list 'auto-mode-alist '("\\.ts\\'" . jtsx-typescript-mode))
+          (add-to-list 'auto-mode-alist '("\\(\\.[c|m]js[m]?\\|\\.har\\)\\'" . jtsx-jsx-mode) t)
+          (add-to-list 'auto-mode-alist '("\\(\\.js[mx]?\\|\\.har\\)\\'" . jtsx-jsx-mode) t)
+
           (define-derived-mode jsx-ts-mode tsx-ts-mode "JavaScript[JSX]")
 
           (define-minor-mode ordenada-javascript-mode
@@ -127,8 +135,25 @@ in
             (keymap-set map "C-l" #'nodejs-repl-load-file)
             (keymap-set map "C-z" #'nodejs-repl-switch-to-repl))
 
-          (keymap-set ordenada-javascript-mode-map "C-c C-r"
-                      '("repl" . ordenada-javascript-nodejs-repl-mode-command-map))
+          (let ((map ordenada-javascript-jtsx-command-map))
+            (keymap-set map "j" #'jtsx-jump-jsx-element-tag-dwim)
+            (keymap-set map "r" #'jtsx-rename-jsx-element)
+            (keymap-set map "<down>" #'jtsx-move-jsx-element-forward)
+            (keymap-set map "<up>" #'jtsx-move-jsx-element-backward)
+            (keymap-set map "<right>" #'jtsx-move-jsx-element-step-in-forward)
+            (keymap-set map "<left>" #'jtsx-move-jsx-element-step-in-backward)
+            (keymap-set map "C-<down>" #'jtsx-move-jsx-element-tag-forward)
+            (keymap-set map "C-<up>" #'jtsx-move-jsx-element-tag-backward)
+            (keymap-set map "w" #'jtsx-wrap-in-jsx-element)
+            (keymap-set map "W" #'jtsx-unwrap-jsx)
+            (keymap-set map "d" #'jtsx-delete-jsx-attribute)
+            (keymap-set map "D" #'jtsx-delete-jsx-node)
+            (keymap-set map "t" #'jtsx-toggle-jsx-attributes-orientation))
+
+          (keymap-set ordenada-javascript-mode-map "C-c N"
+                      '("node repl" . ordenada-javascript-nodejs-repl-mode-command-map))
+          (keymap-set ordenada-javascript-mode-map "C-c j"
+                      '("j/tsx" . ordenada-javascript-jtsx-command-map))
           (keymap-set ordenada-javascript-mode-map "C-c f"
                       '("Format buffer" . eslint-fix))
           (keymap-set ordenada-javascript-mode-map "C-c c i"
@@ -202,6 +227,7 @@ in
           flymake-eslint
           js2-mode
           js2-refactor
+          jtsx
           jsdoc
           npm-mode
           nodejs-repl
