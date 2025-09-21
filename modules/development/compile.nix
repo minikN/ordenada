@@ -49,6 +49,20 @@ with pkgs.lib.ordenada;
           (advice-add 'project-compile :override #'ordenada-project-compile)
           (with-eval-after-load 'project
             (setopt project-compilation-buffer-name-function #'ordenada-compilation-buffer-name))
+
+          (setq compilation-scroll-output t
+                comint-scroll-show-maximum-output t
+                comint-scroll-to-bottom-on-output t
+                comint-scroll-to-bottom-on-input t)
+
+          (defun ordenada-compile--always-follow-comint (output)
+            "Always scroll comint buffers to bottom after new OUTPUT."
+            (when (and (derived-mode-p 'comint-mode)
+              (get-buffer-window (current-buffer)))
+            (with-selected-window (get-buffer-window (current-buffer))
+              (goto-char (point-max)))))
+
+          (add-hook 'comint-output-filter-functions #'ordenada-compile--always-follow-comint)
         '';
         elispPackages = with pkgs.emacsPackages; [ envrc ];
       };
