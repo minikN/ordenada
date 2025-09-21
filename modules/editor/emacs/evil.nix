@@ -74,6 +74,34 @@ with pkgs.lib.ordenada;
 
             (with-eval-after-load
                 'evil
+                (evil-define-command ordenada-evil-open-below-comment-aware (&optional count)
+                  "Like `evil-open-below`, but if inside a documentation type comment, continue it."
+                  (interactive "p")
+                  (let* ((line-length (- (line-end-position) (line-beginning-position)))
+                        (inside-comment (save-excursion
+                                          (end-of-line)
+                                          (nth 4 (syntax-ppss))))
+                        (block-start (save-excursion
+                          (beginning-of-line)
+                          (if (looking-at "\\(?: \\*\\|/\\*\\*\\|/\\*\\)")
+                             (match-string 0)
+                           nil)))
+                        (block-end (save-excursion
+                          (end-of-line)
+                          (when (>= line-length 2)
+                            (backward-char 2))
+                          (if (looking-at "\\(?:\\*/\\)")
+                             t
+                           nil)))
+                        (i (or count 1)))
+                    (dotimes (x i)
+                      (evil-open-below 1)
+                      (when (and inside-comment (stringp block-start) (not block-end))
+                        (beginning-of-line)
+                        (insert " * ")))))
+
+              (define-key evil-normal-state-map (kbd "o") #'ordenada-evil-open-below-comment-aware)
+
               (add-hook 'evil-mode-hook 'ordenada-evil-hook)
               (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
               (define-key evil-insert-state-map
