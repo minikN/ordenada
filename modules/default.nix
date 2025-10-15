@@ -1,7 +1,6 @@
 {
-  lib,
   config,
-  pkgs,
+  lib,
   system ? builtins.currentSystem,
   ...
 }:
@@ -49,4 +48,17 @@ in
   ++ lib.optionals (isDarwin) [
     ./package-management/homebrew.nix
   ];
+
+  options = {
+    ordenada.globals.linux = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether or not the WM is running under wayland.";
+      default = isLinux;
+    };
+    ordenada.globals.darwin = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether or not the WM is running under wayland.";
+      default = isDarwin;
+    };
+  };
 }
