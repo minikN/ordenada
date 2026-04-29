@@ -11,15 +11,10 @@ mkFeature {
     "corfu"
   ];
   options = {
-    globalModes = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      description = "List of modes where Corfu should be enabled.";
-      default = [ ];
-    };
     autoShow = lib.mkOption {
       type = lib.types.bool;
       description = "Whether the corfu popup should appear automatically while typing.";
-      default = true;
+      default = false;
     };
   };
   homeManager =
@@ -28,26 +23,15 @@ mkFeature {
       programs.emacs = ordenada-lib.mkElispConfig pkgs {
         name = "ordenada-corfu";
         config = with config.ordenada.features.emacs.corfu; ''
-          (autoload 'corfu-history-mode "corfu-history")
-          (corfu-history-mode)
+          (unless (display-graphic-p)
+            (corfu-terminal-mode +1))
+          (setopt tab-always-indent t)
           (with-eval-after-load 'corfu
-            (let ((map corfu-map))
-              (define-key map "\t" #'corfu-next)
-              (keymap-set map "<tab>" #'corfu-next)
-              (keymap-set map "<backtab>" #'corfu-previous)
-              (keymap-set map "S-TAB" #'corfu-previous)
-              (keymap-set map "M-p" #'corfu-doc-scroll-down)
-              (keymap-set map "M-n" #'corfu-doc-scroll-up)
-              (keymap-set map "M-d" #'corfu-info-documentation)
-              (keymap-set map "M-l" #'corfu-info-location))
+            (setopt corfu-auto ${if autoShow then "t" else "nil"})
+            (setopt corfu-cycle t)
+            (setopt corfu-preview-current nil)
 
-            (defun ordenada-corfu-move-to-minibuffer ()
-              (interactive)
-              (let ((completion-extra-properties corfu--extra)
-                    completion-cycle-threshold completion-cycling)
-                (apply 'consult-completion-in-region completion-in-region--data)))
-            (keymap-set corfu-map "M-m" #'ordenada-corfu-move-to-minibuffer)
-
+            ;; Enable in minibuffer
             (defun ordenada-corfu-enable-in-minibuffer ()
               "Enable Corfu in the minibuffer if `completion-at-point' is bound."
               (when (where-is-internal 'completion-at-point
@@ -55,24 +39,22 @@ mkFeature {
                 (corfu-mode 1)))
             (add-hook 'minibuffer-setup-hook #'ordenada-corfu-enable-in-minibuffer)
 
-            (setopt corfu-auto-prefix 2)
-            (setopt corfu-min-width 60)
-            (setopt corfu-cycle t)
-            ${if autoShow then ''
-              (setopt corfu-auto t)
-            '' else ""}
-            (setopt global-corfu-modes '(${toString globalModes}))
-            (global-corfu-mode 1)
-            (add-hook 'after-init-hook #'corfu-candidate-overlay-mode)
-            (add-hook 'corfu-mode-hook #'corfu-popupinfo-mode)
-            (setopt kind-icon-default-face #'corfu-default)
-            (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-            (set-face-attribute 'corfu-default nil :inherit 'fixed-pitch))
+            ;; Move to minibuffer
+            (defun ordenada-corfu-move-to-minibuffer ()
+              (interactive)
+              (pcase completion-in-region--data
+                (`(,beg ,end ,table ,pred ,extras)
+                 (let ((completion-extra-properties extras)
+                       completion-cycle-threshold completion-cycling)
+                   (consult-completion-in-region beg end table pred)))))
+            (keymap-set corfu-map "M-m" #'ordenada-corfu-move-to-minibuffer)
+            (add-to-list 'corfu-continue-commands #'ordenada-corfu-move-to-minibuffer)
+            (keymap-set corfu-map "M-m" #'ordenada-corfu-move-to-minibuffer))
         '';
         elispPackages = with pkgs.emacsPackages; [
           cape
           corfu
-          corfu-candidate-overlay
+          corfu-terminal
         ];
       };
     };
