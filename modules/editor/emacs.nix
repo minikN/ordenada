@@ -177,6 +177,9 @@ mkFeature {
               (with-eval-after-load 'treesit
                 (setopt treesit-font-lock-level ${toString config.ordenada.features.emacs.treesitFontLockLevel}))
             '';
+          elispPackages = with pkgs.emacsPackages; [
+            wgrep
+          ];
         };
       }
     ];
