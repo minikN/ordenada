@@ -1,16 +1,28 @@
 { lib, mkFeature, ... }:
 
+let
+  inherit (lib) mkPackageOption mkForce mkIf;
+in
 mkFeature {
   name = "alacritty";
   options =
     { pkgs, ... }:
     {
-      package = lib.mkPackageOption pkgs "alacritty" { };
+      package = mkPackageOption pkgs "alacritty" { };
     };
   globals =
     { config, ... }:
     {
-      apps.terminal = with config.ordenada.features.alacritty; lib.mkForce "${package}/bin/alacritty";
+      apps.terminal =
+        with config.ordenada.features.alacritty;
+        let
+          path =
+            if (config.ordenada.globals.platform == "darwin") then
+              "${package}/Applications/Alacritty.app/Contents/MacOS/alacritty"
+            else
+              "${package}/bin/alacritty";
+        in
+        mkIf (enable) (mkForce path);
     };
   homeManager =
     { config, ... }:
