@@ -1,9 +1,9 @@
-{ mkFeature, ordenada-lib, ... }:
+{ lib, mkFeature, ordenada-lib, ... }:
 
 mkFeature {
   name = "direnv";
   homeManager =
-    { pkgs, ... }:
+    { config, pkgs, ... }:
     {
       home.packages = with pkgs; [ direnv ];
       programs.emacs = ordenada-lib.mkElispConfig pkgs {
@@ -16,5 +16,10 @@ mkFeature {
         '';
         elispPackages = with pkgs.emacsPackages; [ envrc ];
       };
+      programs.bash.bashrcExtra = let
+        enabled = config.ordenada.features.bash.enable == true;
+      in lib.mkIf(enabled) ''
+        eval "$(direnv hook bash)"
+      '';
     };
 }
